@@ -24,3 +24,5 @@ app.use((error, _req, res, _next) => {
 });
 
 connectDatabase().then(() => app.listen(process.env.PORT || 5000, () => console.log(`Server ready on http://localhost:${process.env.PORT || 5000}`)));
+
+module.exports = app;
