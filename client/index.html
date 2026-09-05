@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Repo2Synopsis AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#"
+          ><span class="brand-mark">R2</span
+          ><span>Repo2Synopsis<small>AI WORKSPACE</small></span></a
+        >
+        <nav>
+          <button class="nav-link active" data-view="workspace">
+            Workspace</button
+          ><button class="nav-link" data-view="analysis">
+            Project Analysis</button
+          ><button class="nav-link" data-view="synopsis">
+            Synopsis and PDF</button
+          ><button class="nav-link" data-view="documentation">
+            Documentation</button
+          ><button class="nav-link" data-view="viva">Viva Prep</button
+            ><button class="nav-link" id="nav-admin" data-view="admin">Admin Panel</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <span class="status-dot"></span> AI services online
+        </div>
+      </aside>
+      <main>
+        <header>
+          <div>
+            <p class="eyebrow">DOCUMENTATION WORKSPACE</p>
+            <h1 id="page-title">Build your project report</h1>
+          </div>
+          <div class="profile" id="guest-actions">
+            <button class="text-button" id="login-button">Login</button>
+            <button id="register-button">Create account</button>
+          </div>
+          <div class="profile hidden" id="account-summary">
+            <span class="avatar">AI</span><span id="account-name">Workspace</span>
+            <button class="text-button" id="logout-button">Logout</button>
+          </div>
+        </header>
+        <section id="workspace" class="view active">
+          <div class="hero-grid">
+            <div>
+              <p class="eyebrow teal">MAJOR PROJECT DOCUMENTATION SUITE</p>
+              <h2>Turn source code into a complete 35-40 page college project report.</h2>
+              <p class="lead">
+                Fill your college & candidate details, provide your GitHub repository, and generate a submission-ready major project synopsis with architectural diagrams and IEEE references.
+              </p>
+            </div>
+            <div class="signal-art" aria-hidden="true">
+              <i></i><i></i><i></i><b>AI</b>
+            </div>
+          </div>
+
+          <!-- WORKSPACE STEPPER -->
+          <div class="workspace-stepper">
+            <div class="step-badge active" id="step-badge-1">
+              <span class="step-num">1</span>
+              <div>
+                <strong>Cover & Candidate Details</strong>
+                <small>Mandatory college & student info</small>
+              </div>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step-badge" id="step-badge-2">
+              <span class="step-num">2</span>
+              <div>
+                <strong>Repository Intelligence</strong>
+                <small>Inspect GitHub AST & stack</small>
+              </div>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step-badge" id="step-badge-3">
+              <span class="step-num">3</span>
+              <div>
+                <strong>35-40 Page Humanized PDF</strong>
+                <small>Submission-ready document</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 1: College & Candidate Details -->
+          <form id="template-form" class="template-form">
+            <div class="view-heading" style="margin-bottom: 8px;">
+              <div>
+                <p class="eyebrow teal">STEP 1: SYNOPSIS COVER & CANDIDATE DETAILS (REQUIRED)</p>
+                <h3 style="margin-bottom: 4px;">Enter your college, project, and candidate details</h3>
+              </div>
+              <span class="page-estimate-badge" style="background: rgba(55,217,195,0.15);">Default Cover: front.jpeg active</span>
+            </div>
+            <div class="template-grid">
+              <input id="college-name" placeholder="College / Institute Name *" required />
+              <input id="university-name" placeholder="University Name (e.g. CSJMU / AKTU) *" required />
+              <input id="course-name" placeholder="Course / Degree (e.g. BCA 5th Sem / B.Tech CSE) *" required />
+              <input id="project-name" placeholder="Project Name / Title *" required />
+              <select id="project-type" aria-label="Project submission type">
+                <option value="individual">Individual Project (Single Candidate)</option>
+                <option value="group">Group Project (Multiple Members)</option>
+              </select>
+              <input id="student-name" placeholder="Candidate Full Name *" required />
+              <input id="roll-no" placeholder="Roll Number *" required />
+              <input id="enrollment-no" placeholder="Enrollment Number (e.g. CSJMA24116003436) *" required />
+              <input id="teacher-name" placeholder="Faculty Guide / Supervisor Name *" required />
+              <input id="academic-year" placeholder="Academic Session (e.g. 2025-2026) *" required />
+              <label class="file-input">
+                College Logo (Optional override)
+                <input id="college-logo" type="file" accept="image/png,image/jpeg,image/webp" />
+              </label>
+              <label class="file-input">
+                Cover Template (Optional override)
+                <input id="cover-template" type="file" accept="image/png,image/jpeg,image/webp" />
+              </label>
+            </div>
+            <div id="group-members" class="group-members hidden">
+              <p class="eyebrow" style="margin-top: 14px;">PROJECT GROUP MEMBERS</p>
+              <div id="group-member-fields"></div>
+              <button id="add-group-member" class="outline-button" type="button">+ Add Group Member</button>
+            </div>
+            <p class="file-hint">
+              <strong>Note:</strong> All fields marked with <code>*</code> are strictly required before repository analysis. Your official <code>front.jpeg</code> is pre-configured as the default Cover Page layout.
+            </p>
+          </form>
+
+          <!-- STEP 2: GitHub Repository Link -->
+          <form id="analyze-form" class="url-form" style="margin-top: 20px;">
+            <p class="eyebrow teal">STEP 2: CONNECT GITHUB REPOSITORY</p>
+            <label for="repository-url" style="font-size: 13px; font-weight: 700; display: block; margin-bottom: 6px;">GitHub Repository URL (Public or Private)</label>
+            <div style="display: flex; gap: 12px; margin-top: 4px; flex-wrap: wrap;">
+              <input
+                id="repository-url"
+                type="url"
+                placeholder="https://github.com/owner/repository"
+                style="flex: 1; min-width: 260px;"
+                required
+              />
+              <button type="submit" id="analyze-btn" class="primary-button" style="padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap;">Analyze Repository & Build Synopsis</button>
+            </div>
+            <p id="form-message" style="margin-top: 8px;">Fill Step 1 details above, then submit your GitHub repository URL.</p>
+          </form>
+          <div class="section-heading">
+            <p class="eyebrow">START HERE</p>
+            <h3>What your workspace produces</h3>
+          </div>
+          <div class="feature-grid">
+            <article>
+              <span class="number">01</span>
+              <h3>Repository intelligence</h3>
+              <p>
+                Detect stack, dependencies, modules, architecture, and project
+                structure.
+              </p>
+            </article>
+            <article>
+              <span class="number">02</span>
+              <h3>AI synopsis</h3>
+              <p>
+                Create college-ready chapters and automatic technical diagrams.
+              </p>
+            </article>
+            <article>
+              <span class="number">03</span>
+              <h3>PDF export</h3>
+              <p>
+                Build a formatted PDF with your college logo and cover template.
+              </p>
+            </article>
+          </div>
+        </section>
+        <section id="analysis" class="view">
+          <div class="view-heading">
+            <div>
+              <p class="eyebrow">MODULE 01</p>
+              <h2>Project Analysis</h2>
+            </div>
+          </div>
+          <div class="metrics">
+            <article>
+              <span>FILES ANALYZED</span><strong id="file-count">--</strong>
+            </article>
+            <article>
+              <span>LANGUAGES</span><strong id="language-count">--</strong>
+            </article>
+            <article>
+              <span>MODULES</span><strong id="module-count">--</strong>
+            </article>
+          </div>
+          <div class="two-column">
+            <article class="panel">
+              <h3>Technology stack</h3>
+              <div id="stack-tags" class="tags"></div>
+            </article>
+            <article class="panel">
+              <h3>Architecture</h3>
+              <p id="architecture">
+                Analyze a repository to view its architecture.
+              </p>
+            </article>
+          </div>
+          <article class="panel">
+            <h3>Detected modules</h3>
+            <ul id="module-list" class="clean-list"></ul>
+          </article>
+        </section>
+        <section id="synopsis" class="view">
+          <div class="view-heading">
+            <div>
+              <p class="eyebrow">MODULE 02</p>
+              <h2>Major Project Synopsis (35-40 Pages)</h2>
+            </div>
+            <button class="outline-button" id="copy-synopsis">Copy All</button>
+          </div>
+          <div class="synopsis-actions">
+            <button id="generate-synopsis">Generate Full 35-40 Page Report</button>
+            <button id="stop-synopsis" class="outline-button hidden" type="button" style="color: #e53e3e; border-color: #e53e3e; font-weight: 600;">Stop Generation</button>
+            <button class="outline-button" id="export-pdf">Download Submission PDF</button>
+            <span id="synopsis-message"></span>
+          </div>
+
+          <div class="chapter-tracker-panel">
+            <div class="tracker-header">
+              <div>
+                <p class="eyebrow teal" style="margin-bottom: 2px;">12-CHAPTER PIPELINE GENERATION</p>
+                <h3 style="margin-bottom: 0;">Report Progress & Live Queue</h3>
+              </div>
+              <div class="page-estimate-badge">
+                <span id="page-counter">Target: 35-40 A4 Pages</span>
+              </div>
+            </div>
+            <div class="progress-bar-wrap">
+              <div id="chapter-progress-bar" class="progress-bar" style="width: 0%;"></div>
+            </div>
+            <div id="chapter-queue-grid" class="chapter-queue-grid"></div>
+          </div>
+
+          <div class="editor-toolbar">
+            <button data-command="bold"><b>B</b></button>
+            <button data-command="italic"><i>I</i></button>
+            <button id="shorten">Shorten</button>
+            <button id="expand">Expand</button>
+            <button class="push-right" id="download-synopsis">
+              Download text
+            </button>
+          </div>
+          <article
+            id="synopsis-editor"
+            class="rich-editor"
+            contenteditable="true"
+          >
+            <h2>Major Project Synopsis</h2>
+            <p>Analyze a GitHub repository and select <strong>Generate Full 35-40 Page Report</strong> to create all 12 publication-grade chapters.</p>
+          </article>
+        </section>
+        <section id="documentation" class="view">
+          <div class="view-heading">
+            <div>
+              <p class="eyebrow">MODULE 04</p>
+              <h2>Documentation Library</h2>
+              <p class="lead">Generate and export modular software engineering documents for this project.</p>
+            </div>
+          </div>
+          <div id="document-grid" class="document-grid"></div>
+        </section>
+        <section id="viva" class="view">
+          <div class="view-heading">
+            <div>
+              <p class="eyebrow">MODULE 06</p>
+              <h2>Viva-Voce Preparation</h2>
+              <p class="lead">Project-tailored oral defense questions and comprehensive model answers.</p>
+            </div>
+            <button id="generate-viva-btn">Generate AI Viva Q&A</button>
+          </div>
+          <p id="viva-status" style="color: var(--teal, #0d7569); font-weight: 500;"></p>
+          <div id="viva-list" class="viva-list"></div>
+        </section>
+        <section id="admin" class="view">
+          <div id="admin-gate" class="panel hidden" style="text-align: center; max-width: 520px; margin: 40px auto; padding: 36px 24px;">
+            <div style="font-size: 40px; margin-bottom: 12px;">🔒</div>
+            <p class="eyebrow" style="color: #e53e3e; font-weight: 700;">ACCESS CONTROL</p>
+            <h2 style="margin: 8px 0 14px; font-size: 1.4rem;">Access Denied: Only admins can access this area.</h2>
+            <p style="color: var(--muted); line-height: 1.6; margin-bottom: 24px;">
+              This section is restricted to system administrators. Please sign in with an administrator account to view platform metrics and management tools.
+            </p>
+            <button id="admin-login-btn" class="primary-button" type="button">Admin Login</button>
+          </div>
+
+          <div id="admin-content" class="hidden">
+            <div class="view-heading">
+              <div>
+                <p class="eyebrow">ADMINISTRATION</p>
+                <h2>Admin Dashboard</h2>
+              </div>
+              <button id="load-admin">Refresh data</button>
+            </div>
+            <div class="metrics">
+              <article>
+                <span>USERS</span><strong id="admin-users">--</strong>
+              </article>
+              <article>
+                <span>REPORTS GENERATED</span><strong id="admin-reports">--</strong>
+              </article>
+              <article>
+                <span>API REQUESTS</span><strong id="admin-requests">--</strong>
+              </article>
+              <article>
+                <span>ACTIVE PROMPTS</span><strong id="admin-prompts">--</strong>
+              </article>
+            </div>
+            <article class="panel">
+              <h3>Administration Access Verified</h3>
+              <p>
+                Connected to MongoDB. Live user accounts, generated synopsis reports, and prompt configurations are active.
+              </p>
+            </article>
+
+            <article class="panel" style="margin-top: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+                <div>
+                  <h3 style="margin: 0 0 4px;">Registered Users Overview</h3>
+                  <p style="color: var(--muted); font-size: 0.88rem; margin: 0;">User accounts, roles, API request volumes, and join timestamps.</p>
+                </div>
+                <span style="font-size: 0.82rem; padding: 4px 10px; background: rgba(13,117,105,0.1); color: var(--teal, #0d7569); border-radius: 4px; font-weight: 600;">Security: Passwords Excluded</span>
+              </div>
+              <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+                  <thead>
+                    <tr style="border-bottom: 2px solid var(--border, #e2e8f0); text-align: left; color: var(--muted);">
+                      <th style="padding: 10px 8px;">USER ID</th>
+                      <th style="padding: 10px 8px;">NAME</th>
+                      <th style="padding: 10px 8px;">EMAIL</th>
+                      <th style="padding: 10px 8px;">ROLE</th>
+                      <th style="padding: 10px 8px;">API REQUESTS</th>
+                      <th style="padding: 10px 8px;">JOINED DATE</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-users-list">
+                    <tr><td colspan="6" style="padding: 16px; text-align: center; color: var(--muted);">Loading registered users...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+    <div id="auth-modal" class="modal">
+      <div class="modal-card">
+        <button class="close-modal" aria-label="Close modal">×</button>
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab" id="tab-login">Sign In</button>
+          <button type="button" class="auth-tab active" id="tab-register">Create Account</button>
+        </div>
+        <p class="eyebrow" id="auth-eyebrow">AUTHENTICATION</p>
+        <h2 id="auth-title">Create your account</h2>
+        <form id="auth-form">
+          <input id="auth-name" placeholder="Full Name" required />
+          <input
+            id="auth-email"
+            type="email"
+            placeholder="College or Personal Email"
+            required
+          />
+          <input
+            id="auth-password"
+            type="password"
+            placeholder="Secure Password"
+            required
+          />
+          <button id="auth-submit" type="submit">Create Account</button>
+        </form>
+        <p id="auth-helper">Sign in to save reports and download your formatted PDF synopsis.</p>
+      </div>
+    </div>
+
+    <!-- Admin Verification & Login Modal -->
+    <div id="admin-modal" class="modal">
+      <div class="modal-card">
+        <button class="close-modal" id="admin-modal-close" aria-label="Close modal">×</button>
+        <div style="font-size: 36px; margin-bottom: 6px; text-align: center;">🛡️</div>
+        <p class="eyebrow" style="color: #e53e3e; font-weight: 700; text-align: center; margin-bottom: 2px;">RESTRICTED AREA</p>
+        <h2 style="text-align: center; margin: 0 0 8px;">Admin Portal Login</h2>
+        <p style="color: var(--muted); font-size: 0.88rem; text-align: center; margin-bottom: 18px; line-height: 1.5;">
+          Requires Administrator ID/Email, Password, and the Secret Server Credential Key.
+        </p>
+        <form id="admin-login-form">
+          <input
+            id="admin-email"
+            type="email"
+            placeholder="Admin Email / ID"
+            required
+            autocomplete="username"
+          />
+          <input
+            id="admin-password"
+            type="password"
+            placeholder="Admin Password"
+            required
+            autocomplete="current-password"
+          />
+          <input
+            id="admin-key"
+            type="password"
+            placeholder="Secret Credential Key (.env)"
+            required
+            autocomplete="off"
+          />
+          <p id="admin-login-error" class="hidden" style="color: #e53e3e; font-size: 0.85rem; margin: 6px 0; font-weight: 500;"></p>
+          <button id="admin-submit" type="submit" style="background: #e53e3e; border-color: #e53e3e; width: 100%; margin-top: 8px;">
+            Verify &amp; Access Dashboard
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>
