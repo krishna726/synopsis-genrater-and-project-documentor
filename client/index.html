@@ -363,20 +363,35 @@
         </div>
         <p class="eyebrow" id="auth-eyebrow">AUTHENTICATION</p>
         <h2 id="auth-title">Create your account</h2>
+        <div id="auth-alert" class="auth-alert hidden"></div>
         <form id="auth-form">
-          <input id="auth-name" placeholder="Full Name" required />
-          <input
-            id="auth-email"
-            type="email"
-            placeholder="College or Personal Email"
-            required
-          />
-          <input
-            id="auth-password"
-            type="password"
-            placeholder="Secure Password"
-            required
-          />
+          <div class="floating-group" id="auth-name-group">
+            <input id="auth-name" type="text" placeholder=" " required autocomplete="name" />
+            <label for="auth-name">Full Name</label>
+          </div>
+          <div class="floating-group">
+            <input
+              id="auth-email"
+              type="email"
+              placeholder=" "
+              required
+              autocomplete="email"
+            />
+            <label for="auth-email">College or Personal Email</label>
+          </div>
+          <div class="floating-group">
+            <input
+              id="auth-password"
+              type="password"
+              placeholder=" "
+              required
+              autocomplete="current-password"
+            />
+            <label for="auth-password">Secure Password</label>
+          </div>
+          <div class="forgot-pass-wrap">
+            <a href="#" id="forgot-password-link">Forgot password?</a>
+          </div>
           <button id="auth-submit" type="submit">Create Account</button>
         </form>
         <p id="auth-helper">Sign in to save reports and download your formatted PDF synopsis.</p>

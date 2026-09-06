@@ -84,9 +84,25 @@ function openAuth(mode) {
   $('#auth-title').textContent = isLogin ? 'Sign In to Your Workspace' : 'Create Free Account';
   $('#auth-submit').textContent = isLogin ? 'Sign In' : 'Create Account';
   $('#auth-helper').textContent = isLogin ? 'Enter your registered email and password to download PDF & save data.' : 'Create an account to save analyses, generate 35-40 page reports, and export PDF.';
-  $('#auth-name').classList.toggle('hidden', isLogin);
-  $('#auth-name').required = !isLogin;
+  $('#auth-name-group')?.classList.toggle('hidden', isLogin);
+  const nameInput = $('#auth-name');
+  if (nameInput) {
+    nameInput.required = !isLogin;
+    nameInput.classList.toggle('hidden', isLogin);
+  }
+  const alertEl = $('#auth-alert');
+  if (alertEl) {
+    alertEl.classList.add('hidden');
+    alertEl.textContent = '';
+  }
   modal.classList.add('show');
+  setTimeout(() => {
+    if (isLogin) {
+      $('#auth-email')?.focus();
+    } else {
+      $('#auth-name')?.focus();
+    }
+  }, 100);
 }
 
 $('#tab-login')?.addEventListener('click', () => openAuth('login'));
@@ -287,19 +303,39 @@ $('#analyze-form').addEventListener('submit', (event) => {
   analyzeRepository();
 });
 
-$('.close-modal').addEventListener('click', () => modal.classList.remove('show'));
+$('.close-modal')?.addEventListener('click', () => modal.classList.remove('show'));
+modal?.addEventListener('click', (e) => {
+  if (e.target === modal) modal.classList.remove('show');
+});
 
-$('#auth-form').addEventListener('submit', async (event) => {
+$('#forgot-password-link')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  const alertEl = $('#auth-alert');
+  if (alertEl) {
+    alertEl.className = 'auth-alert info';
+    alertEl.textContent = 'To reset your password, contact your system administrator or re-register with your academic email.';
+    alertEl.classList.remove('hidden');
+  } else {
+    alert('To reset your password, contact your system administrator or re-register with your academic email.');
+  }
+});
+
+$('#auth-form')?.addEventListener('submit', async (event) => {
   event.preventDefault();
   const submitBtn = $('#auth-submit');
+  const alertEl = $('#auth-alert');
   const originalText = submitBtn.textContent;
   submitBtn.disabled = true;
   submitBtn.textContent = 'Processing...';
+  if (alertEl) {
+    alertEl.classList.add('hidden');
+    alertEl.textContent = '';
+  }
 
   const body = {
-    name: $('#auth-name').value.trim(),
-    email: $('#auth-email').value.trim().toLowerCase(),
-    password: $('#auth-password').value
+    name: $('#auth-name')?.value.trim() || '',
+    email: $('#auth-email')?.value.trim().toLowerCase() || '',
+    password: $('#auth-password')?.value || ''
   };
   const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/signup';
 
@@ -311,7 +347,14 @@ $('#auth-form').addEventListener('submit', async (event) => {
     });
     const data = await response.json();
     if (!response.ok) {
-      alert(data.message || 'Unable to authenticate. Please check your credentials.');
+      const msg = data.message || 'Unable to authenticate. Please check your credentials.';
+      if (alertEl) {
+        alertEl.className = 'auth-alert error';
+        alertEl.textContent = msg;
+        alertEl.classList.remove('hidden');
+      } else {
+        alert(msg);
+      }
       return;
     }
     token = data.token;
@@ -321,7 +364,14 @@ $('#auth-form').addEventListener('submit', async (event) => {
     setSignedIn(data.user);
     if (pendingUrl && validateCoverDetails()) analyzeRepository();
   } catch (err) {
-    alert(err.message || 'Network error during authentication.');
+    const errMessage = err.message || 'Network error during authentication.';
+    if (alertEl) {
+      alertEl.className = 'auth-alert error';
+      alertEl.textContent = errMessage;
+      alertEl.classList.remove('hidden');
+    } else {
+      alert(errMessage);
+    }
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = originalText;
@@ -675,6 +725,11 @@ $('#download-synopsis').addEventListener('click', () => {
   URL.revokeObjectURL(link.href);
 });
 async function loadAdminStats() {
+  token = localStorage.getItem('r2s_token') || token;
+  if (!currentUser) {
+    const stored = localStorage.getItem('r2s_user');
+    if (stored) { try { currentUser = JSON.parse(stored); } catch (_) {} }
+  }
   if (!token || !currentUser || currentUser.role !== 'admin') return;
   try {
     const response = await fetch('/api/admin/stats', { headers: authHeaders() });
@@ -693,6 +748,11 @@ async function loadAdminStats() {
 }
 
 async function loadAdminUsers() {
+  token = localStorage.getItem('r2s_token') || token;
+  if (!currentUser) {
+    const stored = localStorage.getItem('r2s_user');
+    if (stored) { try { currentUser = JSON.parse(stored); } catch (_) {} }
+  }
   if (!token || !currentUser || currentUser.role !== 'admin') return;
   const listEl = $('#admin-users-list');
   if (!listEl) return;
@@ -724,11 +784,38 @@ async function loadAdminUsers() {
   }
 }
 
-$('#load-admin')?.addEventListener('click', () => {
+$('#load-admin')?.addEventListener('click', async () => {
+  token = localStorage.getItem('r2s_token') || token;
+  if (!currentUser) {
+    const stored = localStorage.getItem('r2s_user');
+    if (stored) { try { currentUser = JSON.parse(stored); } catch (_) {} }
+  }
+
   if (!token || !currentUser || currentUser.role !== 'admin') {
     openAdminModal();
     return;
   }
-  loadAdminStats();
-  loadAdminUsers();
+
+  const btn = $('#load-admin');
+  const originalHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.classList.add('is-refreshing');
+  btn.innerHTML = '<span class="spinner-icon"></span> Refreshing...';
+
+  try {
+    await Promise.all([loadAdminStats(), loadAdminUsers()]);
+    btn.innerHTML = '✓ Refreshed!';
+    setTimeout(() => {
+      btn.innerHTML = originalHtml;
+      btn.disabled = false;
+      btn.classList.remove('is-refreshing');
+    }, 1500);
+  } catch (_) {
+    btn.innerHTML = 'Refresh Failed';
+    setTimeout(() => {
+      btn.innerHTML = originalHtml;
+      btn.disabled = false;
+      btn.classList.remove('is-refreshing');
+    }, 1800);
+  }
 });
