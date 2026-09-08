@@ -104,7 +104,6 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.post("/admin-login", (req, res, next) => {
-  // Delegate to /api/admin/login logic
   req.url = "/login";
   return require("./adminRoutes")(req, res, next);
 });
