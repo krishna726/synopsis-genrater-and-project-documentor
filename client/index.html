@@ -324,6 +324,37 @@
               </p>
             </article>
 
+            <article class="panel" style="margin-top: 20px; border: 1px solid var(--primary, #2563eb); background: rgba(37, 99, 235, 0.02);">
+              <div class="view-heading" style="margin-bottom: 10px;">
+                <div>
+                  <p class="eyebrow" style="color: var(--primary, #2563eb); font-weight: 700;">ADMIN SECURITY CONTROL</p>
+                  <h3 style="margin: 0;">Change User Password</h3>
+                </div>
+              </div>
+              <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 16px;">
+                Enter a User ID (or click any User ID in the table below) and a new password (min 8 chars &amp; symbol) to reset credentials.
+              </p>
+              <form id="admin-change-pass-form" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                <input
+                  id="admin-change-user-id"
+                  placeholder="User ID (e.g. 66a...)"
+                  required
+                  style="flex: 1; min-width: 220px;"
+                />
+                <input
+                  id="admin-change-new-pass"
+                  type="password"
+                  placeholder="New Password (min 8 chars & symbol)"
+                  required
+                  style="flex: 1; min-width: 240px;"
+                />
+                <button id="admin-change-pass-btn" type="submit" style="white-space: nowrap;">
+                  Change Password
+                </button>
+              </form>
+              <p id="admin-change-pass-msg" class="hidden" style="margin-top: 12px; font-size: 0.88rem; font-weight: 600;"></p>
+            </article>
+
             <article class="panel" style="margin-top: 20px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
                 <div>
@@ -349,37 +380,6 @@
                   </tbody>
                 </table>
               </div>
-            </article>
-
-            <article class="panel" style="margin-top: 20px;">
-              <div class="view-heading" style="margin-bottom: 10px;">
-                <div>
-                  <p class="eyebrow">ADMIN SECURITY CONTROL</p>
-                  <h3 style="margin: 0;">Change User Password</h3>
-                </div>
-              </div>
-              <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 16px;">
-                Enter a User ID (or click any User ID in the table above) and a new password (min 8 characters, 1 special symbol) to reset their credentials.
-              </p>
-              <form id="admin-change-pass-form" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-                <input
-                  id="admin-change-user-id"
-                  placeholder="User ID (e.g. 66a...)"
-                  required
-                  style="flex: 1; min-width: 220px;"
-                />
-                <input
-                  id="admin-change-new-pass"
-                  type="password"
-                  placeholder="New Password (min 8 chars & symbol)"
-                  required
-                  style="flex: 1; min-width: 240px;"
-                />
-                <button id="admin-change-pass-btn" type="submit" style="white-space: nowrap;">
-                  Change Password
-                </button>
-              </form>
-              <p id="admin-change-pass-msg" class="hidden" style="margin-top: 12px; font-size: 0.88rem; font-weight: 600;"></p>
             </article>
           </div>
         </section>

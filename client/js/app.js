@@ -312,15 +312,7 @@ modal?.addEventListener('click', (e) => {
 
 $('#forgot-password-link')?.addEventListener('click', (e) => {
   e.preventDefault();
-  const alertEl = $('#auth-alert');
-  const msg = 'Contact the administrator (krishnakushwaha123kk@gmail.com) to reset password.';
-  if (alertEl) {
-    alertEl.className = 'auth-alert info';
-    alertEl.textContent = msg;
-    alertEl.classList.remove('hidden');
-  } else {
-    alert(msg);
-  }
+  alert('Contact the administrator (krishnakushwaha123kk@gmail.com) to reset password.');
 });
 
 $('#auth-form')?.addEventListener('submit', async (event) => {
