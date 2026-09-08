@@ -139,4 +139,29 @@ router.patch("/users/:id/role", async (req, res, next) => {
   }
 });
 
+router.patch("/users/:id/password", async (req, res, next) => {
+  try {
+    const { password } = req.body;
+    if (!password || password.length < 8) {
+      return res.status(400).json({ message: "Password must be at least 8 characters long." });
+    }
+    if (!/[^a-zA-Z0-9]/.test(password)) {
+      return res.status(400).json({ message: "Password must contain at least one special symbol." });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { password: hashedPassword },
+      { new: true }
+    ).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found with this ID." });
+    }
+    res.json({ message: `Password for ${user.email} updated successfully.`, user });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

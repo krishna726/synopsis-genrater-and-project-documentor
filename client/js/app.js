@@ -90,6 +90,8 @@ function openAuth(mode) {
     nameInput.required = !isLogin;
     nameInput.classList.toggle('hidden', isLogin);
   }
+  const passLabel = $('label[for="auth-password"]');
+  if (passLabel) passLabel.textContent = isLogin ? 'Secure Password' : 'Password (min 8 chars & symbol)';
   const alertEl = $('#auth-alert');
   if (alertEl) {
     alertEl.classList.add('hidden');
@@ -311,12 +313,13 @@ modal?.addEventListener('click', (e) => {
 $('#forgot-password-link')?.addEventListener('click', (e) => {
   e.preventDefault();
   const alertEl = $('#auth-alert');
+  const msg = 'Contact the administrator (krishnakushwaha123kk@gmail.com) to reset password.';
   if (alertEl) {
     alertEl.className = 'auth-alert info';
-    alertEl.textContent = 'To reset your password, contact your system administrator or re-register with your academic email.';
+    alertEl.textContent = msg;
     alertEl.classList.remove('hidden');
   } else {
-    alert('To reset your password, contact your system administrator or re-register with your academic email.');
+    alert(msg);
   }
 });
 
@@ -325,18 +328,48 @@ $('#auth-form')?.addEventListener('submit', async (event) => {
   const submitBtn = $('#auth-submit');
   const alertEl = $('#auth-alert');
   const originalText = submitBtn.textContent;
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Processing...';
-  if (alertEl) {
-    alertEl.classList.add('hidden');
-    alertEl.textContent = '';
-  }
 
   const body = {
     name: $('#auth-name')?.value.trim() || '',
     email: $('#auth-email')?.value.trim().toLowerCase() || '',
     password: $('#auth-password')?.value || ''
   };
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(body.email)) {
+    if (alertEl) {
+      alertEl.className = 'auth-alert error';
+      alertEl.textContent = 'Please enter a valid email address.';
+      alertEl.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (authMode !== 'login') {
+    if (body.password.length < 8) {
+      if (alertEl) {
+        alertEl.className = 'auth-alert error';
+        alertEl.textContent = 'Password must be at least 8 characters long.';
+        alertEl.classList.remove('hidden');
+      }
+      return;
+    }
+    if (!/[^a-zA-Z0-9]/.test(body.password)) {
+      if (alertEl) {
+        alertEl.className = 'auth-alert error';
+        alertEl.textContent = 'Password must contain at least one special symbol (e.g. @, #, $, !).';
+        alertEl.classList.remove('hidden');
+      }
+      return;
+    }
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Processing...';
+  if (alertEl) {
+    alertEl.classList.add('hidden');
+    alertEl.textContent = '';
+  }
   const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/signup';
 
   try {
@@ -769,7 +802,7 @@ async function loadAdminUsers() {
     }
     listEl.innerHTML = users.map((u) => `
       <tr style="border-bottom: 1px solid var(--border, #e2e8f0);">
-        <td style="padding: 10px 8px; font-family: monospace; font-size: 0.8rem; color: var(--muted);">${escapeHtml(String(u._id || '').slice(-8))}...</td>
+        <td style="padding: 10px 8px; font-family: monospace; font-size: 0.8rem; color: var(--primary); cursor: pointer;" title="Click to fill User ID" onclick="if(document.getElementById('admin-change-user-id')) document.getElementById('admin-change-user-id').value='${u._id}'">${escapeHtml(String(u._id || ''))}</td>
         <td style="padding: 10px 8px; font-weight: 600;">${escapeHtml(u.name || 'Anonymous')}</td>
         <td style="padding: 10px 8px;">${escapeHtml(u.email || '--')}</td>
         <td style="padding: 10px 8px;">
@@ -817,5 +850,59 @@ $('#load-admin')?.addEventListener('click', async () => {
       btn.disabled = false;
       btn.classList.remove('is-refreshing');
     }, 1800);
+  }
+});
+
+$('#admin-change-pass-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const userId = $('#admin-change-user-id')?.value.trim();
+  const newPass = $('#admin-change-new-pass')?.value || '';
+  const msgEl = $('#admin-change-pass-msg');
+  const btn = $('#admin-change-pass-btn');
+
+  if (!userId) {
+    if (msgEl) {
+      msgEl.textContent = 'Please enter a User ID.';
+      msgEl.style.color = '#ef4444';
+      msgEl.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (newPass.length < 8 || !/[^a-zA-Z0-9]/.test(newPass)) {
+    if (msgEl) {
+      msgEl.textContent = 'Password must be at least 8 characters and contain at least 1 special symbol.';
+      msgEl.style.color = '#ef4444';
+      msgEl.classList.remove('hidden');
+    }
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+
+  try {
+    const res = await fetch(`/api/admin/users/${userId}/password`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ password: newPass })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to update user password.');
+    if (msgEl) {
+      msgEl.textContent = data.message || 'Password updated successfully!';
+      msgEl.style.color = '#10b981';
+      msgEl.classList.remove('hidden');
+    }
+    $('#admin-change-new-pass').value = '';
+  } catch (err) {
+    if (msgEl) {
+      msgEl.textContent = err.message || 'Error updating password.';
+      msgEl.style.color = '#ef4444';
+      msgEl.classList.remove('hidden');
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Change Password';
   }
 });
